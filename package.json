@@ -1,5 +1,5 @@
 {
-  "homepage": "http://jayes5089.github.io/reggie",
+  "homepage": "https://jayes5089.github.io/reggie",
   "name": "reggie",
   "private": true,
   "version": "0.0.0",
@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "react": "^19.0.0",
