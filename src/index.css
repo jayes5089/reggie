@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.bg-header {
+    background-color: #231620;
+}
+
+.bg-main {
+    background-color: #43273d;
+}

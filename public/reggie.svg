@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="696.50031"
+   height="380.37637"
+   viewBox="0 0 696.50028 380.37637"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   sodipodi:docname="reggie.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     inkscape:zoom="0.417193"
+     inkscape:cx="583.66272"
+     inkscape:cy="103.0698"
+     inkscape:window-width="1317"
+     inkscape:window-height="1032"
+     inkscape:window-x="412"
+     inkscape:window-y="36"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-3.4997021,-131.62379)">
+    <path
+       d="m 404.48547,220.90936 v 339.0625 h -76.5625 V 143.95624 h 76.5625 v 73.4375 q 0.78125,-15.23438 7.03125,-28.51563 6.25,-13.67187 16.40625,-23.4375 10.54688,-10.15625 24.21875,-15.625 13.67188,-5.85937 29.29688,-5.85937 h 81.64062 q 16.01563,0 29.6875,6.25 14.0625,5.85937 24.60938,16.40625 10.54687,10.15625 16.40625,24.21875 6.25,14.0625 6.25,30.07812 v 70.3125 h -76.95313 v -70.3125 z"
+       id="text1"
+       style="font-size:800px;font-family:Aldrich;-inkscape-font-specification:'Aldrich, Normal';fill:#ffffff;stroke-width:46.0171"
+       transform="scale(1.0936947,0.91433194)"
+       aria-label="r" />
+    <path
+       d="m 303.1123,419.90519 -16.40624,16.40624 H 141.91448 v -44.01039 h 85.93745 L 3.3729019,167.82201 34.622883,136.57203 259.10191,361.05106 v -85.93745 h 44.01039 z"
+       id="text2"
+       style="font-size:533.333px;font-family:Aldrich;-inkscape-font-specification:'Aldrich, Normal';fill:#ffffff;stroke-width:22.927"
+       transform="scale(1.0375938,0.96376828)"
+       aria-label="↘" />
+  </g>
+</svg>
