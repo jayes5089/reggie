@@ -4,9 +4,9 @@ const NFAtable = ({ graph }) => {
     if (!graph || !graph.nodes || graph.nodes.length === 0) return null;
 
     const rows = graph.edges.map((edge, idx) => ({
-        from: edge.data.source,
-        symbol: edge.data.label,
-        to: edge.data.target,
+        from: edge.from,
+        symbol: edge.label,
+        to: edge.to,
         key: idx,
     }));
 
