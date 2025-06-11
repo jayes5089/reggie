@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useCallback } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import { Dialog } from "@headlessui/react"
 import { Node, Edge } from "../logic/canvasObject"
 import {
@@ -7,7 +7,8 @@ import {
   syncCanvasSize,
   toGraphObject,
   renderCanvas,
-  createEdge
+  createEdge,
+  rebuildEdgeNodes
 } from "../logic/graphUtils"
 
 export default function NFAVisualizer({ graph, onGraphUpdate }) {
@@ -29,6 +30,7 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
   const [draggingNode, setDraggingNode] = useState(null)
   const [draggingEdge, setDraggingEdge] = useState(null)
 
+  const nextIdRef = useRef(0)
   const isPanning = useRef(false)
   const panStart = useRef({ x: 0, y: 0 })
   const offsetStart = useRef({ x: 0, y: 0 })
@@ -51,10 +53,17 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
         if (e.from === e.to && e.loopAngle != null) {
           ed.loopAngle = e.loopAngle
         }
+        if (e.control) {
+          ed.control = { x: e.control.x, y: e.control.y }
+        }
         return ed
       })
     setNodes(drawableNodes)
     setEdges(drawableEdges)
+    const numericIds = drawableNodes
+      .map(n => parseInt((n.id.match(/\d+/) || [])[0]))
+      .filter(id => !Number.isNaN(id))
+    nextIdRef.current = numericIds.length ? Math.max(...numericIds) + 1 : 0
   }, [graph])
 
   useEffect(() => {
@@ -140,18 +149,21 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
         ? new Node(n.id, n.label, n.x, n.y, flipped)
         : n
     )
-    updateWith(updatedNodes, edges)
+    const rebuiltEdges = rebuildEdgeNodes(updatedNodes, edges)
+    updateWith(updatedNodes, rebuiltEdges)
     setContextMenu(null)
   }
 
   const renameEdge = edge => {
     const newLabel = window.prompt("New transition label:", edge.label)
     if (newLabel && newLabel !== edge.label) {
-      const updatedEdges = edges.map(e =>
-        e.id === edge.id
-          ? new Edge(e.from, e.to, newLabel)
-          : e
-      )
+      const updatedEdges = edges.map(e => {
+        if (e.id !== edge.id) return e
+        const ne = new Edge(e.from, e.to, newLabel, e.id)
+        if (e.control) ne.control = { ...e.control }
+        ne.loopAngle = e.loopAngle
+        return ne
+      })
       updateWith(nodes, updatedEdges)
     }
     setContextMenu(null)
@@ -235,21 +247,20 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
       return
     }
     if (draggingEdge) {
-      const { x, y } = getMousePos(e)
-      draggingEdge.control = {
-        x: (x - offsetX) / scale,
-        y: (y - offsetY) / scale
+      if (draggingEdge.from == draggingEdge.to) {
+        const { x: mx, y: my } = getMousePos(e)
+        const px = draggingEdge.from.x * scale + offsetX
+        const py = draggingEdge.from.y * scale + offsetY
+        draggingEdge.loopAngle = Math.atan2(my - py, mx - px)
+      } else {
+        const { x, y } = getMousePos(e)
+        draggingEdge.control = {
+          x: (x - offsetX) / scale,
+          y: (y - offsetY) / scale,
+        }
       }
       setEdges(es => [...es])
       return
-    }
-    if (draggingEdge && draggingEdge.from === draggingEdge.to) {
-      const { x: mx, y: my } = getMousePos(e);
-      const px = draggingEdge.from.x * scale + offsetX;
-      const py = draggingEdge.from.y * scale + offsetY;
-      draggingEdge.loopAngle = Math.atan2(my - py, mx - px);
-      setEdges(es => [...es]);
-      return;
     }
     if (isPanning.current) {
       const dx = pos.x - panStart.current.x
@@ -280,7 +291,8 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
   }
 
   const addNode = ({ x, y }) => {
-    const id = `q${nodes.length}`
+    const id = `q${nextIdRef.current}`
+    nextIdRef.current += 1
     const n = new Node(id, id, Math.round(x / 40) * 40, Math.round(y / 40) * 40, false)
     updateWith(nodes.concat(n), edges)
     setContextMenu(null)

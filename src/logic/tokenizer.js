@@ -91,9 +91,10 @@ export function insertConcatOperators(tokens) {
     if (!curr) continue;
 
     const canConcat =
-      (prev &&
-        (prev.type === 'literal' || prev.type === 'escape' || prev.type === 'charclass' || prev.value === ')' || prev.value === '*') &&
-        (curr.type === 'literal' || curr.type === 'escape' || curr.type === 'charclass' || curr.value === '('));
+      prev &&
+        (prev.type === 'literal' || prev.type === 'escape' || prev.type === 'charclass' ||
+          prev.value === ')' || prev.value === '*' || prev.value === '+' || prev.value === '?') &&
+        (curr.type === 'literal' || curr.type === 'escape' || curr.type === 'charclass' || curr.value === '(');
 
     if (canConcat) {
       output.splice(output.length - 1, 0, { type: 'operator', value: '.' });

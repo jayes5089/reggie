@@ -12,11 +12,20 @@ export function renameItem(list, item, newLabel, onlyLabel = false) {
 export function renameNodeAndEdges(node, newId, nodeList, edges) {
     const oldId = node.id;
     const nodeMap = Object.fromEntries(nodeList.map(n => [n.id, n]));
-    return edges.map(e => new Edge(
-        e.from.id === oldId ? nodeMap[newId] : (nodeMap[e.from.id] || e.from),
-        e.to.id === oldId ? nodeMap[newId] : (nodeMap[e.to.id] || e.to),
-        e.label
-    ));
+    return edges.map(e => {
+        const newEdge = new Edge(
+            e.from.id === oldId ? nodeMap[newId] : (nodeMap[e.from.id] || e.from),
+            e.to.id === oldId ? nodeMap[newId] : (nodeMap[e.to.id] || e.to),
+            e.label
+        );
+        if (e.control) {
+            newEdge.control = { x: e.control.x, y: e.control.y };
+        }
+        if (e.loopAngle != null) {
+            newEdge.loopAngle = e.loopAngle;
+        }
+        return newEdge;
+    });
 }
 
 export function deleteById(list, id) {
@@ -31,6 +40,24 @@ export function deleteNodeAndEdges(nodeId, nodes, edges) {
 
 export function toggleNodeAccepting(node) {
     node.isAccept = !node.isAccept;
+}
+
+export function rebuildEdgeNodes(nodeList, edges) {
+    const nodeMap = Object.fromEntries(nodeList.map(n => [n.id, n]));
+    return edges.map(e => {
+        const edge = new Edge(
+            nodeMap[e.from.id] || e.from,
+            nodeMap[e.to.id] || e.to,
+            e.label
+        );
+        if (e.control) {
+            edge.control = { ...e.control };
+        }
+        if (e.loopAngle != null) {
+            edge.loopAngle = e.loopAngle;
+        }
+        return edge;
+    });
 }
 
 export function updateEdgeLabel(edge, newLabel) {
@@ -69,7 +96,8 @@ export function toGraphObject(nodes, edges) {
             label: e.label,
             control: e.control
                 ? { x: e.control.x, y: e.control.y}
-                : null
+                : null,
+            loopAngle: e.from === e.to ? e.loopAngle : undefined
         }))
     };
 }

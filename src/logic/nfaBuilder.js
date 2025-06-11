@@ -104,7 +104,7 @@ export function graphToNFA(graphElements) {
   edges.forEach((edge) => {
     const fromId = edge.from;
     const toId = edge.to;
-    const label = edge.data?.label || "ε";
+    const label = edge.label || edge.data?.label || "ε";
     const fromState = stateMap.get(fromId);
     const toState = stateMap.get(toId);
 

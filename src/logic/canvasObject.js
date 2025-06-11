@@ -72,9 +72,11 @@ function distToSegment(px, py, x1, y1, x2, y2) {
   return Math.hypot(px - projX, py - projY)
 }
 
+let edgeCounter = 0;
 export class Edge extends Drawable {
-  constructor(fromNode, toNode, label) {
+  constructor(fromNode, toNode, label, id = `e${edgeCounter++}`) {
     super(0, 0);
+    this.id = id;
     this.from = fromNode;
     this.to = toNode;
     this.label = label;
@@ -96,10 +98,11 @@ export class Edge extends Drawable {
     if (this.from === this.to) {
       const radius = this.from.radius * scale;
       const loopRadius = radius * 0.6;
-      const cx = x1;
-      const cy = y1 - radius - 13 * scale;
-      const startAngle = 0.2 * Math.PI + Math.PI / 2;
-      const endAngle = 1.8 * Math.PI + Math.PI / 2;
+      const offset = radius + 13 * scale;
+      const cx = x1 + offset * Math.cos(this.loopAngle);
+      const cy = y1 + offset * Math.sin(this.loopAngle);
+      const startAngle = this.loopAngle + 0.2 * Math.PI;
+      const endAngle = this.loopAngle + 1.8 * Math.PI;
       ctx.beginPath();
       ctx.arc(cx, cy, loopRadius, startAngle, endAngle);
       ctx.stroke();
