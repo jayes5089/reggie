@@ -29,18 +29,23 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const [draggingNode, setDraggingNode] = useState(null)
   const [draggingEdge, setDraggingEdge] = useState(null)
+  const [startNodeId, setStartNodeId] = useState(null);
 
   const nextIdRef = useRef(0)
   const isPanning = useRef(false)
   const panStart = useRef({ x: 0, y: 0 })
   const offsetStart = useRef({ x: 0, y: 0 })
 
-  const updateWith = (newNodes, newEdges) => {
+  const updateWith = (newNodes, newEdges, newStartId = startNodeId) => {
     const finalNodes = newNodes ?? nodes;
     const finalEdges = newEdges ?? edges;
     setNodes(finalNodes)
     setEdges(finalEdges)
-    onGraphUpdate(toGraphObject(finalNodes, finalEdges))
+    setStartNodeId(newStartId);
+    onGraphUpdate({
+      ...toGraphObject(finalNodes, finalEdges),
+      startNodeId: newStartId
+    });
   };
 
   useEffect(() => {
@@ -60,11 +65,18 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
       })
     setNodes(drawableNodes)
     setEdges(drawableEdges)
+    setStartNodeId(graph?.startNodeId ?? drawableNodes[0]?.id);
     const numericIds = drawableNodes
       .map(n => parseInt((n.id.match(/\d+/) || [])[0]))
       .filter(id => !Number.isNaN(id))
     nextIdRef.current = numericIds.length ? Math.max(...numericIds) + 1 : 0
   }, [graph])
+
+  const setAsStart = (node) => {
+    setStartNodeId(node.id);
+    updateWith(nodes, edges, node.id);
+    setContextMenu(null);
+  }
 
   useEffect(() => {
     const canvas = canvasRef.current

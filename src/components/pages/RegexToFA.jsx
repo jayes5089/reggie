@@ -58,7 +58,7 @@ export default function RegexToFA() {
           onChange={e => setRegex(e.target.value)}
           className="w-full bg-black border border-green-700 rounded px-2 py-1 text-green-300 focus:outline-none focus:ring focus:ring-yellow-400"
         />
-        <RegexSymbolDropdown onInsert={handleInsertSymbol} />
+        <RegexSymbolDropdown onInsert={handleInsertSymbol} className="bg-black" />
         <button
           onClick={handleConvert}
           className="mt-2 bg-yellow-400 text-white px-4 py-1 rounded hover:bg-yellow-300 transition"
@@ -71,6 +71,7 @@ export default function RegexToFA() {
       <div>
         <label className="text-yellow-400 block font-semibold">Test String:</label>
         <TextHighlighter
+          className="bg-[#1f1f1f]"
           testString={testString}
           matches={matchRegex()}
           onChange={(e) => setTestString(e.target.value)}

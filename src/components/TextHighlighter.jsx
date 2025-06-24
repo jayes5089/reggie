@@ -40,7 +40,7 @@ const TextHighlighter = ({ testString, matches, onChange }) => {
 
     return (
         <div className="relative w-full mt-2">
-            <div className="absolute inset-0 p-2 whitespace-pre-wrap break-words font-mono text-sm text-black pointer-events-none z-0">
+            <div className="absolute inset-0 p-2 whitespace-pre-wrap break-words font-mono text-sm text-white pointer-events-none z-0">
                 {segments.length > 0
                     ? segments.map((segment, idx) =>
                         segment.highlight ? (
@@ -55,7 +55,7 @@ const TextHighlighter = ({ testString, matches, onChange }) => {
                 ref={textareaRef}
                 value={testString}
                 onChange={onChange}
-                className="relative z-10 w-full border border-gray-300 rounded px-3 py-2 h-32 caret-black selection:bg-blue-200 font-mono resize-none"
+                className="bg-black relative z-10 w-full border border-gray-300 rounded px-3 py-2 h-32 caret-black selection:bg-blue-200 font-mono resize-none"
                 style={{ overflow: 'hidden' }}
             ></textarea>
         </div>
