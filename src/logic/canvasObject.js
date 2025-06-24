@@ -4,8 +4,8 @@ export class Drawable {
     this.x = x;
     this.y = y;
   }
-  draw(ctx, transform) {}
-  isHit(x, y, scale = 1, offsetX = 0, offsetY = 0) {
+  draw() {}
+  isHit() {
     return false;
   }
 }

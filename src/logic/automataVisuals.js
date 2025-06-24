@@ -34,7 +34,7 @@ export function visualizeNFA(startState) {
 }
 
 export function visualizeDFA(dfa) {
-  const { dfaStates, dfaTransitions, acceptingStates, startState } = dfa;
+  const { dfaStates, dfaTransitions, acceptingStates } = dfa;
   const nodes = [];
   const edges = [];
 

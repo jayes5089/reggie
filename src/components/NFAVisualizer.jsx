@@ -65,7 +65,11 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
       })
     setNodes(drawableNodes)
     setEdges(drawableEdges)
-    setStartNodeId(graph?.startNodeId ?? drawableNodes[0]?.id);
+    const startId =
+      graph && Object.prototype.hasOwnProperty.call(graph, 'startNodeId')
+        ? graph.startNodeId
+        : drawableNodes[0]?.id;
+    setStartNodeId(startId ?? null);
     const numericIds = drawableNodes
       .map(n => parseInt((n.id.match(/\d+/) || [])[0]))
       .filter(id => !Number.isNaN(id))
@@ -73,8 +77,9 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
   }, [graph])
 
   const setAsStart = (node) => {
-    setStartNodeId(node.id);
-    updateWith(nodes, edges, node.id);
+    const newStart = node.id === startNodeId ? null : node.id
+    setStartNodeId(newStart);
+    updateWith(nodes, edges, newStart);
     setContextMenu(null);
   }
 
@@ -82,8 +87,8 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
     const canvas = canvasRef.current
     const ctx = canvas?.getContext("2d")
     if (!canvas || !ctx) return
-    renderCanvas(ctx, canvas, nodes, edges, scale, offsetX, offsetY, transitionStart, mousePos)
-  }, [nodes, edges, scale, offsetX, offsetY, transitionStart, mousePos])
+    renderCanvas(ctx, canvas, nodes, edges, scale, offsetX, offsetY, transitionStart, mousePos, startNodeId)
+  }, [nodes, edges, scale, offsetX, offsetY, transitionStart, mousePos, startNodeId])
 
   useEffect(() => {
     const resizeCanvas = () => syncCanvasSize(canvasRef.current, containerRef.current)
@@ -191,8 +196,6 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
     const pos = getMousePos(e)
     setMousePos(pos)
     const hitNode = nodes.find(n => n.isHit(pos.x, pos.y, scale, offsetX, offsetY))
-    const hitEdge = edges.find(ed => ed.isHit(pos.x, pos.y, scale, offsetX, offsetY))
-    const hitControlEdge = edges.find(ed => ed.isHitControl(pos.x, pos.y, scale, offsetX, offsetY));
     const hitAnyEdge = edges.find(ed => ed.isHit(pos.x, pos.y, scale, offsetX, offsetY));
 
     if (e.button === 0 && hitNode && !transitionStart) {
@@ -364,6 +367,9 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
           style={{ top: contextMenu.y, left: contextMenu.x }}
         >
           <p className="font-bold">{contextMenu.target.label}</p>
+          <button onClick={() => setAsStart(contextMenu.target)}>
+            {startNodeId === contextMenu.target.id ? 'Unset Start' : 'Set as Start'}
+          </button>
           <button onClick={() => renameNode(contextMenu.target)}>Rename Node</button>
           <button onClick={() => toggleAccepting(contextMenu.target)}>Toggle Accept</button>
           <button onClick={() => startTransition(contextMenu.target)}>

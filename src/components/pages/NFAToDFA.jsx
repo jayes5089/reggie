@@ -3,7 +3,7 @@ import NFAVisualizer from '../NFAVisualizer';
 import NFAtable from '../NFAtable';
 import { graphToNFA } from '../../logic/nfaBuilder';
 import { convertNFAtoDFA, minimizeDFA } from '../../logic/dfaUtils';
-import { visualizeNFA, visualizeDFA } from '../../logic/automataVisuals';
+import { visualizeDFA } from '../../logic/automataVisuals';
 
 export default function NFAtoDFA() {
   const [graph, setGraph] = useState({ nodes: [], edges: [] });
@@ -11,7 +11,7 @@ export default function NFAtoDFA() {
 
   const handleConvert = () => {
     try {
-      const { start } = graphToNFA([...graph.nodes, ...graph.edges]);
+      const { start } = graphToNFA(graph);
       const dfa = convertNFAtoDFA(start);
       const visual = visualizeDFA(dfa);
       setDfaGraph(visual);
@@ -23,7 +23,7 @@ export default function NFAtoDFA() {
 
   const handleMinimize = () => {
     try {
-      const { start } = graphToNFA([...graph.nodes, ...graph.edges]);
+      const { start } = graphToNFA(graph);
       const dfa = convertNFAtoDFA(start);
       const minimized = minimizeDFA(dfa);
       const visual = visualizeDFA(minimized);

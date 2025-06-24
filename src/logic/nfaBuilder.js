@@ -62,7 +62,6 @@ export function buildNFA(postfixTokens) {
       stack.push(new Fragment(s, a));
     } else if (token.value === '+') {
       const f = stack.pop();
-      const s = new State();
       const a = new State();
       f.accept.addTransition(EPSILON, f.start);
       f.accept.addTransition(EPSILON, a);
@@ -83,13 +82,20 @@ export function buildNFA(postfixTokens) {
   return result;
 }
 
-export function graphToNFA(graphElements) {
+export function graphToNFA(graph) {
   const stateMap = new Map();
   const acceptingStates = new Set();
   let startState = null;
 
-  const nodes = graphElements.filter(el => el.id !== undefined);
-  const edges = graphElements.filter(el => el.from !== undefined);
+  let nodes, edges, startId;
+  if (Array.isArray(graph)) {
+    nodes = graph.filter(el => el.id !== undefined);
+    edges = graph.filter(el => el.from !== undefined);
+  } else {
+    nodes = graph.nodes || [];
+    edges = graph.edges || [];
+    startId = graph.startNodeId;
+  }
 
   nodes.forEach((node) => {
     const id = node.id;
@@ -98,7 +104,7 @@ export function graphToNFA(graphElements) {
     stateMap.set(id, state);
 
     if (node.isAccept) acceptingStates.add(id);
-    if (!startState) startState = state;
+    if (startId ? id === startId : !startState) startState = state;
   });
 
   edges.forEach((edge) => {

@@ -102,13 +102,39 @@ export function toGraphObject(nodes, edges) {
     };
 }
 
-export function renderCanvas(ctx, canvas, nodes, edges, scale, offsetX, offsetY, transitionStart, mousePos) {
+export function renderCanvas(ctx, canvas, nodes, edges, scale, offsetX, offsetY, transitionStart, mousePos, startNodeId) {
     const safeEdges = Array.isArray(edges) ? edges : [edges];
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     drawGrid(ctx, canvas, scale, offsetX, offsetY);
     safeEdges.forEach(edge => edge.draw(ctx, { scale, offsetX, offsetY }));
     nodes.forEach(node => node.draw(ctx, { scale, offsetX, offsetY }));
 
+    if (startNodeId) {
+        const startNode = nodes.find(n => n.id === startNodeId);
+        if (startNode) {
+            const sx = startNode.x * scale + offsetX;
+            const sy = startNode.y * scale + offsetY;
+            const startX = sx - startNode.radius - 30 * scale;
+            const headX = sx - startNode.radius * scale;
+
+            ctx.strokeStyle = '#e6ebff';
+            ctx.fillStyle = '#e6ebff';
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.moveTo(startX, sy);
+            ctx.lineTo(headX, sy);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(headX, sy);
+            ctx.lineTo(headX - 8 * scale, sy - 5 * scale);
+            ctx.lineTo(headX - 8 * scale, sy + 5 * scale);
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+    
     if (transitionStart) {
         const x1 = transitionStart.x * scale + offsetX;
         const y1 = transitionStart.y * scale + offsetY;

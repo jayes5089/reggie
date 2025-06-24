@@ -9,7 +9,7 @@ export default function FAToRegex() {
 
   const handleConvert = () => {
     try {
-      const { start, states } = graphToNFA(graph.nodes.concat(graph.edges));
+      const { start, states } = graphToNFA(graph);
       const regex = convertNFAtoRegex(start, states);
       setResult(regex);
     } catch (err) {
