@@ -88,7 +88,7 @@ export function graphToNFA(graphElements) {
   const acceptingStates = new Set();
   let startState = null;
 
-  const nodes = graphElements.filter(el => el.label !== undefined);
+  const nodes = graphElements.filter(el => el.id !== undefined);
   const edges = graphElements.filter(el => el.from !== undefined);
 
   nodes.forEach((node) => {
@@ -104,7 +104,7 @@ export function graphToNFA(graphElements) {
   edges.forEach((edge) => {
     const fromId = edge.from;
     const toId = edge.to;
-    const label = edge.label || edge.data?.label || "ε";
+    const label = edge.label ?? edge.data?.label ?? "ε";
     const fromState = stateMap.get(fromId);
     const toState = stateMap.get(toId);
 
