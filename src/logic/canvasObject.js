@@ -81,7 +81,7 @@ export class Edge extends Drawable {
     this.to = toNode;
     this.label = label;
     this.control = null;
-    this.loopAngle = Math.PI;
+    this.loopAngle = -Math.PI / 2;
   }
 
   draw(ctx, { scale = 1, offsetX = 0, offsetY = 0 } = {}) {
@@ -101,15 +101,15 @@ export class Edge extends Drawable {
       const offset = radius + 13 * scale;
       const cx = x1 + offset * Math.cos(this.loopAngle);
       const cy = y1 + offset * Math.sin(this.loopAngle);
-      const startAngle = this.loopAngle + 0.2 * Math.PI;
+      const startAngle = this.loopAngle + 0.2 * -Math.PI;
       const endAngle = this.loopAngle + 1.8 * Math.PI;
       ctx.beginPath();
       ctx.arc(cx, cy, loopRadius, startAngle, endAngle);
       ctx.stroke();
 
-      const angle = endAngle + Math.PI / 2;
       const ahX = cx + loopRadius * Math.cos(endAngle);
       const ahY = cy + loopRadius * Math.sin(endAngle);
+      const angle = endAngle + 1.8 - Math.PI / 2 ;
       const len = 10 * scale;
 
       ctx.beginPath();
@@ -198,17 +198,29 @@ export class Edge extends Drawable {
     const y2 = this.to.y * scale + offsetY;
 
     if (this.from === this.to) {
-      const r = this.from.radius * scale;
-      const cx = x1;
-      const cy = y1 - 1.5 * r;
-      return Math.hypot(cx - x, cy - y) <= r;
+      const radius = this.from.radius * scale;
+      const loopRadius = radius * 0.6;
+      const offset = radius + 13 * scale;
+      const cx = x1 + offset * Math.cos(this.loopAngle);
+      const cy = y1 + offset * Math.sin(this.loopAngle);
+      const dist = Math.abs(Math.hypot(x - cx, y - cy) - loopRadius);
+      return dist < 10;
     }
     if (!this.control) {
       return distToSegment(x, y, x1, y1, x2, y2) < 8
     }
-    const midX = (x1 + x2 + this.control.x*scale + offsetX) / 3
-    const midY = (y1 + y2 + this.control.y*scale + offsetY) / 3
-    return Math.hypot(x - midX, y - midY) < 12
+    const cx = this.control.x * scale + offsetX;
+    const cy = this.control.y * scale + offsetY;
+    const steps = 20;
+    for (let i = 0; i < steps; i++) {
+      const t1 = i / steps;
+      const t2 = (i + 1) / steps;
+      const p1x = (1 - t1) * (1 - t1) * x1 + 2 * (1 - t1) * t1 * cx + t1 * t1 * x2;
+      const p1y = (1 - t1) * (1 - t1) * y1 + 2 * (1 - t1) * t1 * cy + t1 * t1 * y2;
+      const p2x = (1 - t2) * (1 - t2) * x1 + 2 * (1 - t2) * t2 * cx + t2 * t2 * x2;
+      const p2y = (1 - t2) * (1 - t2) * y1 + 2 * (1 - t2) * t2 * cy + t2 * t2 * y2;
+      if (distToSegment(x, y, p1x, p1y, p2x, p2y) < 8) return true;
+    }
   }
   isHitControl(x, y, scale = 1, offsetX = 0, offsetY = 0) {
     if (!this.control) return false;

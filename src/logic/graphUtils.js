@@ -66,12 +66,6 @@ export function updateEdgeLabel(edge, newLabel) {
 
 export function createEdge(fromNode, toNode, label = 'ε') {
     const edge = new Edge(fromNode, toNode, label);
-    if (fromNode !== toNode) {
-        edge.control = {
-         x: (fromNode.x + toNode.x) / 2,
-         y: (fromNode.y + toNode.y) / 2 - 40 // offset for curvature
-        };
-    }
     return edge;
 }
 
