@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react"
 import { Dialog } from "@headlessui/react"
 import { Node, Edge } from "../logic/canvasObject"
+import AutomataInfoPanel from "./AutomataInfoPanel"
 import {
   renameNodeAndEdges,
   deleteNodeAndEdges,
@@ -11,7 +12,7 @@ import {
   rebuildEdgeNodes
 } from "../logic/graphUtils"
 
-export default function NFAVisualizer({ graph, onGraphUpdate }) {
+export default function NFAVisualizer({ graph, onGraphUpdate, showInfoPanel = true }) {
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
   const menuRef = useRef(null)
@@ -332,99 +333,106 @@ export default function NFAVisualizer({ graph, onGraphUpdate }) {
     setTransitionStart(null)
     setLabelModalOpen(false)
     setNewLabel("")
-    setLabelInputTarget(null)
+  setLabelInputTarget(null)
   }
 
+  const infoGraph = { ...toGraphObject(nodes, edges), startNodeId }
+
   return (
-    <div ref={containerRef} className="relative w-full h-[600px]">
-      <canvas
-        ref={canvasRef}
-        className="bg-[#121212] block w-full border border-[#4ade80]"
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onContextMenu={handleContextMenu}
-      />
+    <div className="flex w-full">
+      <div ref={containerRef} className="relative flex-1 h-[600px]">
+        <canvas
+          ref={canvasRef}
+          className="bg-[#121212] block w-full border border-[#4ade80]"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onContextMenu={handleContextMenu}
+        />
 
-      <div className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-2 py-1 rounded shadow z-10 pointer-events-none">
-        Zoom: {Math.round(scale * 100)}%
+        <div className="absolute bottom-2 right-2 bg-black/80 text-white text-sm px-2 py-1 rounded shadow z-10 pointer-events-none">
+          Zoom: {Math.round(scale * 100)}%
+        </div>
+
+        {contextMenu?.type === "canvas" && (
+          <div 
+            ref={menuRef} 
+            className="absolute bg-black border border-[#4ade80] p-2 z-50 shadow rounded" 
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+          >
+            <button onClick={() => addNode(contextMenu.pos)}>Add Node</button>
+          </div>
+        )}
+
+        {contextMenu?.type === "node" && (
+          <div 
+            ref={menuRef} 
+            className="absolute border border-[#4ade80] bg-black p-2 z-50 shadow rounded flex flex-col" 
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+          >
+            <p className="font-bold">{contextMenu.target.label}</p>
+            <button onClick={() => setAsStart(contextMenu.target)}>
+              {startNodeId === contextMenu.target.id ? 'Unset Start' : 'Set as Start'}
+            </button>
+            <button onClick={() => renameNode(contextMenu.target)}>Rename Node</button>
+            <button onClick={() => toggleAccepting(contextMenu.target)}>Toggle Accept</button>
+            <button onClick={() => startTransition(contextMenu.target)}>
+              Add Transition
+            </button>
+            <button onClick={() => deleteNode(contextMenu.target)}>Delete Node</button>
+          </div>
+        )}
+
+        {contextMenu?.type === "edge" && (
+          <div
+            ref={menuRef}
+            className="absolute bg-black border border-[#4ade80] flex flex-col p-2"
+            style={{ top: contextMenu.y, left: contextMenu.x }}
+          >
+            <button onClick={() => renameEdge(contextMenu.target)}>Rename Transition</button>
+            <button onClick={() => deleteEdge(contextMenu.target)}>Delete Transition</button>
+          </div>
+        )}
+
+        <Dialog 
+          open={labelModalOpen} 
+          onClose={() => {
+            setLabelModalOpen(false) 
+            setNewLabel("")
+          }}
+        >
+          <div className="fixed inset-0 bg-black/30"/>
+          <div className="fixed inset-0 flex items-center justify-center">
+            <Dialog.Panel className="bg-white p-4 rounded shadow">
+              <Dialog.Title className="font-bold">Transition Label</Dialog.Title>
+              <input
+                className="border rounded px-2 py-1 mt-2"
+                value={newLabel}
+                onChange={e => setNewLabel(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && handleLabelSubmit(newLabel)}
+                placeholder="Enter Label (ε default)"
+              />
+              <div className="mt-4 flex justify-end gap-2">
+                <button 
+                  className="px-2 py-1 bg-blue-600 text-white rounded" 
+                  onClick={() => handleLabelSubmit(newLabel)}
+                >
+                  OK
+                </button>
+                <button 
+                  className="px-2 py-1 bg-gray-300 rounded" 
+                  onClick={() => setLabelModalOpen(false)}
+                >
+                  CANCEL
+                </button>
+              </div>
+            </Dialog.Panel>
+          </div>
+        </Dialog>
       </div>
-
-      {contextMenu?.type === "canvas" && (
-        <div 
-          ref={menuRef} 
-          className="absolute bg-black border border-[#4ade80] p-2 z-50 shadow rounded" 
-          style={{ top: contextMenu.y, left: contextMenu.x }}
-        >
-          <button onClick={() => addNode(contextMenu.pos)}>Add Node</button>
-        </div>
+      {showInfoPanel && (
+        <AutomataInfoPanel graph={infoGraph} />
       )}
-
-      {contextMenu?.type === "node" && (
-        <div 
-          ref={menuRef} 
-          className="absolute border border-[#4ade80] bg-black p-2 z-50 shadow rounded flex flex-col" 
-          style={{ top: contextMenu.y, left: contextMenu.x }}
-        >
-          <p className="font-bold">{contextMenu.target.label}</p>
-          <button onClick={() => setAsStart(contextMenu.target)}>
-            {startNodeId === contextMenu.target.id ? 'Unset Start' : 'Set as Start'}
-          </button>
-          <button onClick={() => renameNode(contextMenu.target)}>Rename Node</button>
-          <button onClick={() => toggleAccepting(contextMenu.target)}>Toggle Accept</button>
-          <button onClick={() => startTransition(contextMenu.target)}>
-            Add Transition
-          </button>
-          <button onClick={() => deleteNode(contextMenu.target)}>Delete Node</button>
-        </div>
-      )}
-
-      {contextMenu?.type === "edge" && (
-        <div
-          ref={menuRef}
-          className="absolute bg-black border border-[#4ade80] flex flex-col p-2"
-          style={{ top: contextMenu.y, left: contextMenu.x }}
-        >
-          <button onClick={() => renameEdge(contextMenu.target)}>Rename Transition</button>
-          <button onClick={() => deleteEdge(contextMenu.target)}>Delete Transition</button>
-        </div>
-      )}
-
-      <Dialog 
-        open={labelModalOpen} 
-        onClose={() => {
-          setLabelModalOpen(false) 
-          setNewLabel("")
-        }}
-      >
-        <div className="fixed inset-0 bg-black/30"/>
-        <div className="fixed inset-0 flex items-center justify-center">
-          <Dialog.Panel className="bg-white p-4 rounded shadow">
-            <Dialog.Title className="font-bold">Transition Label</Dialog.Title>
-            <input
-              className="border rounded px-2 py-1 mt-2"
-              value={newLabel}
-              onChange={e => setNewLabel(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && handleLabelSubmit(newLabel)}
-              placeholder="Enter Label (ε default)"
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <button 
-                className="px-2 py-1 bg-blue-600 text-white rounded" 
-                onClick={() => handleLabelSubmit(newLabel)}
-              >
-                OK
-              </button>
-              <button 
-                className="px-2 py-1 bg-gray-300 rounded" 
-                onClick={() => setLabelModalOpen(false)}
-              >
-                CANCEL
-              </button>
-            </div>
-          </Dialog.Panel>
-        </div>
-      </Dialog>
     </div>
   )
 }
