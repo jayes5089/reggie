@@ -31,10 +31,10 @@ const RegexExplanation = ({ regex }) => {
     });
 
     return (
-        <div className="bg-gray-50 border rounded p-3 mt-2">
+        <div className="bg-black border border-green-700 rounded p-3 mt-2">
             <h3 className="font-semibold mb-1">Regex Explanation</h3>
             {explanations.length > 0 ? (
-                <ul className="list-disc list-inside text-sm text-gray-700">
+                <ul className="list-disc list-inside text-sm text-gray-100">
                     {explanations.map((exp, idx) => (
                         <li key={idx}>{exp}</li>
                     ))}

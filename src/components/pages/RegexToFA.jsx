@@ -50,36 +50,44 @@ export default function RegexToFA() {
 
   return (
     <div className="space-y-6 text-green-400 font-mono">
-      <div>
-        <label className="text-yellow-400 block font-semibold">Enter Regular Expression:</label>
-        <input
-          type="text"
-          value={regex}
-          onChange={e => setRegex(e.target.value)}
-          className="w-full bg-black border border-green-700 rounded px-2 py-1 text-green-300 focus:outline-none focus:ring focus:ring-yellow-400"
-        />
-        <RegexSymbolDropdown onInsert={handleInsertSymbol} className="bg-black" />
-        <button
-          onClick={handleConvert}
-          className="mt-2 bg-yellow-400 text-white px-4 py-1 rounded hover:bg-yellow-300 transition"
-        >
-          Convert to NFA
-        </button>
-        <RegexExplanation regex={regex} />
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex flex-col w-full md:w-1/2">
+          <div>
+            <label className="text-green-200 block font-semibold">Enter Regular Expression:</label>
+            <input
+              type="text"
+              value={regex}
+              onChange={e => setRegex(e.target.value)}
+              className="w-full bg-black border border-green-700 rounded px-2 py-1 text-green-200 selection:bg-blue-200"
+            />
+            <RegexSymbolDropdown onInsert={handleInsertSymbol} />
+            <button
+              onClick={handleConvert}
+              className="mt-2 bg-green-700 text-white px-4 py-1 rounded hover:bg-yellow-300 transition"
+            >
+              Convert to NFA
+            </button>
+            <RegexExplanation regex={regex} />
+          </div>
+        </div>
+
+        <div className="w-full md:w-1/2">
+          <div className="flex flex-col">
+            <div>
+              <label className="text-green-200 block font-semibold">Test String:</label>
+              <TextHighlighter
+                className="bg-[#1f1f1f]"
+                testString={testString}
+                matches={matchRegex()}
+                onChange={(e) => setTestString(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
       </div>
 
       <div>
-        <label className="text-yellow-400 block font-semibold">Test String:</label>
-        <TextHighlighter
-          className="bg-[#1f1f1f]"
-          testString={testString}
-          matches={matchRegex()}
-          onChange={(e) => setTestString(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <h2 className="text-yellow-400 text-xl font-bold mb-2">NFA Visualization:</h2>
+        <h2 className="text-green-200 text-xl font-bold mb-2">NFA Visualization:</h2>
         {graph && (
           <>
             <NFAVisualizer graph={graph} onGraphUpdate={setGraph} />

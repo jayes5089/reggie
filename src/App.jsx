@@ -13,7 +13,7 @@ export default function App() {
           <div className="flex items-center gap-2">
             <img src={reggielogo} className="w-15 h-10" alt="logo" />
           </div>
-          <nav className="flex gap-4 text-yellow-400">
+          <nav className="flex gap-4 text-green-200">
             <Link to="/regex-to-fa" className="hover:underline font-bold">Regex → FA</Link> 
             <Link to="/fa-to-regex" className="hover:underline font-bold">FA → Regex</Link>
             <Link to="/nfa-dfa" className="hover:underline font-bold">NFA ↔ DFA</Link>

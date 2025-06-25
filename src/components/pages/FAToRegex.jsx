@@ -25,7 +25,7 @@ export default function FAToRegex() {
         <NFAVisualizer graph={graph} onGraphUpdate={setGraph} />
         <button
           onClick={handleConvert}
-          className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+          className="mt-4 bg-green-700 text-white px-4 py-2 rounded hover:bg-indigo-700"
         >
           Convert to Regex
         </button>

@@ -44,7 +44,7 @@ const RegexSymbolDropdown = ({ onInsert }) => {
     return (
         <select
             onChange={handleChange}
-            className="mt-2 mb-4 w-full md:w-auto border border-gray-300 rounded px-2 py-1"
+            className="mt-2 w-1/4 md:w-auto border border-green-400 bg-black rounded mr-2 px-2 py-1"
         >
             <option value="">Insert Regex Symbol...</option>
             {Object.entries(regexSymbols).map(([category, symbols]) => (
