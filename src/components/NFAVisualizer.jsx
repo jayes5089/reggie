@@ -12,7 +12,12 @@ import {
   rebuildEdgeNodes
 } from "../logic/graphUtils"
 
-export default function NFAVisualizer({ graph, onGraphUpdate, showInfoPanel = true }) {
+export default function NFAVisualizer({ 
+  graph, 
+  onGraphUpdate, 
+  showInfoPanel = true,
+  mode = 'nfa',
+}) {
   const canvasRef = useRef(null)
   const containerRef = useRef(null)
   const menuRef = useRef(null)
@@ -175,6 +180,21 @@ export default function NFAVisualizer({ graph, onGraphUpdate, showInfoPanel = tr
   const renameEdge = edge => {
     const newLabel = window.prompt("New transition label:", edge.label)
     if (newLabel && newLabel !== edge.label) {
+      if (mode === 'dfa') {
+        if (newLabel === 'ε') {
+          alert('Epsilon transitions are not allowed in DFA Mode.');
+          setContextMenu(null);
+          return;
+        }
+        const other = edges.find(
+          e => e.from.id === edge.from.id && e.label === newLabel && e.id !== edge.id
+        )
+        if (other) {
+          alert('DFA cannot have multiple transitions with the same symbol from a state.');
+          setContextMenu(null);
+          return;
+        }
+      }
       const updatedEdges = edges.map(e => {
         if (e.id !== edge.id) return e
         const ne = new Edge(e.from, e.to, newLabel, e.id)
@@ -320,20 +340,57 @@ export default function NFAVisualizer({ graph, onGraphUpdate, showInfoPanel = tr
   }
 
   const handleLabelSubmit = (label) => {
+    const finalLabel = label || 'ε';
     if (labelInputTarget?.type === 'transition') {
       const { from, to } = labelInputTarget
-      const newEdge = createEdge(from, to, label || 'ε');
-      setEdges([...edges, newEdge])
-      updateWith(nodes, [...edges, newEdge])
-    } else if (labelInputTarget?.type === 'edit') {
-      labelInputTarget.edge.label = label || 'ε'
-      setEdges([...edges])
-      updateWith(nodes, [...edges])
+      if (mode === 'dfa') {
+        if (finalLabel === 'ε') {
+          alert('Epsilon transitions are not allowed in DFA mode.')
+          return
+        }
+        const existing = edges.find(
+          (e) => e.from.id === from.id && e.label === finalLabel
+        );
+        if (existing) {
+          const updatedEdges = edges.map((e) => {
+            if (e === existing) {
+              const ne = new Edge(from, to, finalLabel, e.id);
+              if (e.control) ne.control = { ...e.control };
+              ne.loopAngle = e.loopAngle;
+              return ne;
+            }
+            return e;
+          });
+          setEdges(updatedEdges);
+          updateWith(nodes, updatedEdges);
+        } else {
+          const newEdge = createEdge(from, to, finalLabel);
+          setEdges([...edges, newEdge]);
+          updateWith(nodes, [...edges, newEdge]);
+        }
+      } else if (labelInputTarget?.type === 'edit') {
+        if (mode === 'dfa') {
+          if (finalLabel === 'ε') {
+            alert('Epsilon transitions are not allowed in DFA mode.');
+            return;
+          }
+          const other = edges.find(
+            (e) => e.from.id === labelInputTarget.edge.from.id && e.label === finalLabel && e.id !== labelInputTarget.edge.id
+          );
+          if (other) {
+            alert('DFA cannot have multiple transitions with the same symbol from a state.');
+            return;
+          }
+        }
+        labelInputTarget.edge.label = finalLabel;
+        setEdges([...edges])
+        updateWith(nodes, [...edges])
+      }
+      setTransitionStart(null)
+      setLabelModalOpen(false)
+      setNewLabel('')
+      setLabelInputTarget(null)
     }
-    setTransitionStart(null)
-    setLabelModalOpen(false)
-    setNewLabel("")
-  setLabelInputTarget(null)
   }
 
   const infoGraph = { ...toGraphObject(nodes, edges), startNodeId }

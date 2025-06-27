@@ -6,6 +6,7 @@ import { graphToNFA } from '../../logic/nfaBuilder';
 export default function FAToRegex() {
   const [graph, setGraph] = useState({ nodes: [], edges: [] });
   const [result, setResult] = useState('');
+  const [mode, setMode] = useState('nfa');
 
   const handleConvert = () => {
     try {
@@ -21,8 +22,23 @@ export default function FAToRegex() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold mb-2">NFA Input</h2>
-        <NFAVisualizer graph={graph} onGraphUpdate={setGraph} />
+        <div className="mb-2 space-x-2">
+          <button
+            className={`px-2 py-1 rounded ${mode === 'nfa' ? 'bg-green-600 text-white' : 'bg-gray-300'}`}
+            onClick={() => setMode('nfa')}
+          >
+            NFA Mode
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${mode === 'dfa' ? 'bg-green-600 text-white' : 'bg-gray-300'}`}
+            onClick={() => setMode('dfa')}
+          >
+            DFA Mode
+          </button>
+        </div>
+
+        <h2 className="text-xl font-bold mb-2">{mode.toUpperCase()} Input</h2>
+        <NFAVisualizer graph={graph} onGraphUpdate={setGraph} mode={mode} />
         <button
           onClick={handleConvert}
           className="mt-4 bg-green-700 text-white px-4 py-2 rounded hover:bg-indigo-700"

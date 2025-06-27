@@ -8,6 +8,7 @@ import { visualizeDFA } from '../../logic/automataVisuals';
 export default function NFAtoDFA() {
   const [graph, setGraph] = useState({ nodes: [], edges: [] });
   const [dfaGraph, setDfaGraph] = useState(null);
+  const [mode, setMode] = useState('nfa');
 
   const handleConvert = () => {
     try {
@@ -37,8 +38,22 @@ export default function NFAtoDFA() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-bold mb-2">NFA Input</h2>
-        <NFAVisualizer graph={graph} onGraphUpdate={setGraph} />
+        <div className="mb-2 space-x-2">
+          <button
+            className={`px-2 py-1 rounded ${mode === 'nfa' ? 'bg-green-600 text-white' : 'bg-gray-300'}`}
+            onClick={() => setMode('nfa')}
+          >
+            NFA Mode
+          </button>
+          <button
+            className={`px-2 py-1 rounded ${mode === 'dfa' ? 'bg-green-600 text-white' : 'bg-gray-300'}`}
+            onClick={() => setMode('dfa')}
+          >
+            DFA Mode
+          </button>
+        </div>
+        <h2 className="text-xl font-bold mb-2">{mode.toUpperCase()} Input</h2>
+        <NFAVisualizer graph={graph} onGraphUpdate={setGraph} mode={mode} />
         <div className="flex gap-4 mt-4">
           <button
             onClick={handleConvert}
@@ -58,7 +73,7 @@ export default function NFAtoDFA() {
       {dfaGraph && (
         <div>
           <h2 className="text-xl font-bold mt-6 mb-2">DFA Visualization</h2>
-          <NFAVisualizer graph={dfaGraph} onGraphUpdate={() => {}} />
+          <NFAVisualizer graph={dfaGraph} onGraphUpdate={() => {}} mode="dfa" />
           <NFAtable graph={dfaGraph} />
         </div>
       )}
