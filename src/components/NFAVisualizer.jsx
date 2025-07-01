@@ -11,6 +11,7 @@ import {
   createEdge,
   rebuildEdgeNodes
 } from "../logic/graphUtils"
+import translateGreek from "../logic/greekTranslator"
 
 export default function NFAVisualizer({ 
   graph, 
@@ -178,32 +179,9 @@ export default function NFAVisualizer({
   }
 
   const renameEdge = edge => {
-    const newLabel = window.prompt("New transition label:", edge.label)
-    if (newLabel && newLabel !== edge.label) {
-      if (mode === 'dfa') {
-        if (newLabel === 'ε') {
-          alert('Epsilon transitions are not allowed in DFA Mode.');
-          setContextMenu(null);
-          return;
-        }
-        const other = edges.find(
-          e => e.from.id === edge.from.id && e.label === newLabel && e.id !== edge.id
-        )
-        if (other) {
-          alert('DFA cannot have multiple transitions with the same symbol from a state.');
-          setContextMenu(null);
-          return;
-        }
-      }
-      const updatedEdges = edges.map(e => {
-        if (e.id !== edge.id) return e
-        const ne = new Edge(e.from, e.to, newLabel, e.id)
-        if (e.control) ne.control = { ...e.control }
-        ne.loopAngle = e.loopAngle
-        return ne
-      })
-      updateWith(nodes, updatedEdges)
-    }
+    setLabelInputTarget({ edge, type: 'edit' })
+    setNewLabel(edge.label)
+    setLabelModalOpen(true)
     setContextMenu(null)
   }
 
@@ -340,7 +318,8 @@ export default function NFAVisualizer({
   }
 
   const handleLabelSubmit = (label) => {
-    const finalLabel = label || 'ε';
+    const translated = translateGreek(label)
+    const finalLabel = translated || 'ε';
 
     if (labelInputTarget?.type === 'transition') {
       const { from, to } = labelInputTarget;
